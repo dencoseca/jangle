@@ -20,22 +20,22 @@ func main() {
 	case "--help", "help":
 		fmt.Println(mainUsage)
 	case "set":
-		jangleSet(os.Args[2:])
+		set(os.Args[2:])
 	case "get":
-		jangleGet(os.Args[2:])
+		get(os.Args[2:])
 	case "update":
-		jangleUpdate(os.Args[2:])
+		update(os.Args[2:])
 	case "ls":
-		jangleList()
+		list()
 	case "delete":
-		jangleDelete(os.Args[2:])
+		delete(os.Args[2:])
 	default:
 		fmt.Println(mainUsage)
 		os.Exit(1)
 	}
 }
 
-func jangleSet(args []string) {
+func set(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(setUsage)
 		return
@@ -58,7 +58,7 @@ func jangleSet(args []string) {
 	fmt.Printf("Successfully added key '%s' to the Keychain.\n", stripPrefix(keyName))
 }
 
-func jangleGet(args []string) {
+func get(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(getUsage)
 		return
@@ -81,7 +81,7 @@ func jangleGet(args []string) {
 	fmt.Println(strings.TrimSpace(string(output)))
 }
 
-func jangleUpdate(args []string) {
+func update(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(updateUsage)
 		return
@@ -109,7 +109,7 @@ func jangleUpdate(args []string) {
 	fmt.Printf("Successfully updated key '%s' in the Keychain.\n", stripPrefix(keyName))
 }
 
-func jangleList() {
+func list() {
 	if len(os.Args[2:]) > 0 {
 		fmt.Println(listUsage)
 		os.Exit(1)
@@ -137,17 +137,17 @@ func jangleList() {
 
 	// Handle case where no keys were found with the `jangle_` prefix
 	if len(keys) == 0 {
-		fmt.Printf("No jangle_ keys found in the Keychain for user '%s'.\n", os.Getenv("USER"))
+		fmt.Printf("No keys found in the Keychain for user '%s'.\n", os.Getenv("USER"))
 		os.Exit(1)
 	}
 
 	// Print keys prefixed with `jangle_`
-	fmt.Printf("jangle_ keys in the Keychain for user '%s':\n", os.Getenv("USER"))
+	fmt.Printf("Keys in the Keychain for user '%s':\n", os.Getenv("USER"))
 	for _, key := range keys {
 		fmt.Printf("  - %s\n", key)
 	}
 }
-func jangleDelete(args []string) {
+func delete(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(deleteUsage)
 		return
