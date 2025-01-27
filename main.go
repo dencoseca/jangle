@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// main executes the command-line interface for managing Mac OS Keychain secrets,
+// handling various commands and their arguments.
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: jangle <command> [args...]")
@@ -35,6 +37,8 @@ func main() {
 	}
 }
 
+// set stores a secret with a specified name and value in the macOS Keychain,
+// ensuring a required input format.
 func set(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(setUsage)
@@ -58,6 +62,9 @@ func set(args []string) {
 	fmt.Printf("Successfully added key '%s' to the Keychain.\n", stripPrefix(keyName))
 }
 
+// get retrieves a secret value by its name from the macOS Keychain and prints it
+// to the console. It validates the input arguments and handles errors if the
+// secret is not found.
 func get(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(getUsage)
@@ -81,6 +88,8 @@ func get(args []string) {
 	fmt.Println(strings.TrimSpace(string(output)))
 }
 
+// update modifies the value of an existing secret in the macOS Keychain or
+// creates it if it does not already exist.
 func update(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(updateUsage)
@@ -109,6 +118,8 @@ func update(args []string) {
 	fmt.Printf("Successfully updated key '%s' in the Keychain.\n", stripPrefix(keyName))
 }
 
+// list retrieves and lists all keys stored in the macOS Keychain with the prefix
+// `jangle_` for the current user.
 func list() {
 	if len(os.Args[2:]) > 0 {
 		fmt.Println(listUsage)
@@ -147,6 +158,9 @@ func list() {
 		fmt.Printf("  - %s\n", key)
 	}
 }
+
+// delete removes a secret by name from the macOS Keychain using the specified
+// arguments. Validates input and handles errors.
 func delete(args []string) {
 	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
 		fmt.Println(deleteUsage)
