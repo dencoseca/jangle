@@ -17,6 +17,8 @@ func main() {
 	mainCommand := os.Args[1]
 
 	switch mainCommand {
+	case "--help", "help":
+		fmt.Println(mainUsage)
 	case "set":
 		jangleSet(os.Args[2:])
 	case "get":
@@ -25,7 +27,7 @@ func main() {
 		jangleUpdate(os.Args[2:])
 	case "ls":
 		jangleList()
-	case "rm":
+	case "delete":
 		jangleDelete(os.Args[2:])
 	default:
 		fmt.Println(mainUsage)
@@ -34,6 +36,11 @@ func main() {
 }
 
 func jangleSet(args []string) {
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+		fmt.Println(setUsage)
+		return
+	}
+
 	if len(args) != 2 {
 		fmt.Println(setUsage)
 		os.Exit(1)
@@ -52,6 +59,11 @@ func jangleSet(args []string) {
 }
 
 func jangleGet(args []string) {
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+		fmt.Println(getUsage)
+		return
+	}
+
 	if len(args) != 1 {
 		fmt.Println(getUsage)
 		os.Exit(1)
@@ -70,6 +82,11 @@ func jangleGet(args []string) {
 }
 
 func jangleUpdate(args []string) {
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+		fmt.Println(updateUsage)
+		return
+	}
+
 	if len(args) != 2 {
 		fmt.Println(updateUsage)
 		os.Exit(1)
@@ -131,6 +148,11 @@ func jangleList() {
 	}
 }
 func jangleDelete(args []string) {
+	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+		fmt.Println(deleteUsage)
+		return
+	}
+
 	if len(args) != 1 {
 		fmt.Println(deleteUsage)
 		os.Exit(1)
