@@ -8,14 +8,14 @@ import (
 	"strings"
 )
 
-const keyPrefix = "jangle_"
+const NAMESPACE_PREFIX = "jangle_"
 
 func addPrefix(key string) string {
-	return keyPrefix + key
+	return NAMESPACE_PREFIX + key
 }
 
 func stripPrefix(key string) string {
-	return strings.TrimPrefix(key, keyPrefix)
+	return strings.TrimPrefix(key, NAMESPACE_PREFIX)
 }
 
 func main() {
@@ -24,9 +24,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	command := os.Args[1]
+	mainCommand := os.Args[1]
 
-	switch command {
+	switch mainCommand {
 	case "set":
 		jangleSet(os.Args[2:])
 	case "get":
@@ -36,32 +36,21 @@ func main() {
 	case "ls":
 		jangleList()
 	case "rm":
-		jangleRemove(os.Args[2:])
+		jangleDelete(os.Args[2:])
 	default:
-		fmt.Println("Unknown command:", command)
-		fmt.Println("Available commands: set, get, update, ls, rm")
+		fmt.Println(mainUsage)
 		os.Exit(1)
 	}
 }
 
 func jangleSet(args []string) {
 	if len(args) != 2 {
-		fmt.Println("Usage: jangle set <key_name> <key_value>")
+		fmt.Println(setUsage)
 		os.Exit(1)
 	}
 
 	keyName := addPrefix(args[0])
 	keyValue := args[1]
-
-	if keyName == "" {
-		fmt.Println("Error: <key_name> cannot be empty.")
-		os.Exit(1)
-	}
-
-	if keyValue == "" {
-		fmt.Println("Error: <key_value> cannot be empty.")
-		os.Exit(1)
-	}
 
 	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w", keyValue)
 	if err := cmd.Run(); err != nil {
@@ -74,16 +63,11 @@ func jangleSet(args []string) {
 
 func jangleGet(args []string) {
 	if len(args) != 1 {
-		fmt.Println("Usage: jangle get <key_name>")
+		fmt.Println(getUsage)
 		os.Exit(1)
 	}
 
 	keyName := addPrefix(args[0])
-
-	if keyName == "" {
-		fmt.Println("Error: <key_name> cannot be empty.")
-		os.Exit(1)
-	}
 
 	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w")
 	output, err := cmd.Output()
@@ -97,22 +81,12 @@ func jangleGet(args []string) {
 
 func jangleUpdate(args []string) {
 	if len(args) != 2 {
-		fmt.Println("Usage: jangle update <key_name> <new_value>")
+		fmt.Println(updateUsage)
 		os.Exit(1)
 	}
 
 	keyName := addPrefix(args[0])
 	newValue := args[1]
-
-	if keyName == "" {
-		fmt.Println("Error: <key_name> cannot be empty.")
-		os.Exit(1)
-	}
-
-	if newValue == "" {
-		fmt.Println("Error: <new_value> cannot be empty.")
-		os.Exit(1)
-	}
 
 	// Delete the old key (if it exists)
 	cmdDelete := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", keyName)
@@ -129,9 +103,14 @@ func jangleUpdate(args []string) {
 }
 
 func jangleList() {
+	if len(os.Args[2:]) > 0 {
+		fmt.Println(listUsage)
+		os.Exit(1)
+	}
+
 	// Execute the security command to dump all keychain items
 	cmd := exec.Command("security", "dump-keychain")
-	output, err := cmd.CombinedOutput() // Capture both stdout and stderr
+	output, err := cmd.CombinedOutput()
 	if err != nil {
 		fmt.Printf("Error accessing the Keychain: %v\n", err)
 		os.Exit(1)
@@ -161,18 +140,13 @@ func jangleList() {
 		fmt.Printf("  - %s\n", key)
 	}
 }
-func jangleRemove(args []string) {
+func jangleDelete(args []string) {
 	if len(args) != 1 {
-		fmt.Println("Usage: jangle rm <key_name>")
+		fmt.Println(deleteUsage)
 		os.Exit(1)
 	}
 
 	keyName := addPrefix(args[0])
-
-	if keyName == "" {
-		fmt.Println("Error: <key_name> cannot be empty.")
-		os.Exit(1)
-	}
 
 	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", keyName)
 	if err := cmd.Run(); err != nil {
