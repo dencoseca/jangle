@@ -6,10 +6,17 @@ import (
 	"os/exec"
 	"regexp"
 	"strings"
+
+	"github.com/charmbracelet/lipgloss"
 )
 
-// main executes the command-line interface for managing Mac OS Keychain secrets,
-// handling various commands and their arguments.
+// Styling using lipgloss
+var (
+	headerStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("5")).Render
+	successStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("10")).Render
+	errorStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("9")).Render
+)
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println(mainUsage)
@@ -38,14 +45,7 @@ func main() {
 	}
 }
 
-// set stores a secret with a specified name and value in the macOS Keychain,
-// ensuring a required input format.
 func set(args []string) {
-	if isHelpArg(args) {
-		fmt.Println(setUsage)
-		return
-	}
-
 	if len(args) != 2 {
 		fmt.Println(setUsage)
 		os.Exit(1)
@@ -56,22 +56,14 @@ func set(args []string) {
 
 	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w", keyValue)
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error: Failed to add key '%s' to the Keychain.\n", stripPrefix(keyName))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to add key '%s' to the Keychain.", stripPrefix(keyName))))
 		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully added key '%s' to the Keychain.\n", stripPrefix(keyName))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully added key '%s' to the Keychain.", stripPrefix(keyName))))
 }
 
-// get retrieves a secret value by its name from the macOS Keychain and prints it
-// to the console. It validates the input arguments and handles errors if the
-// secret is not found.
 func get(args []string) {
-	if isHelpArg(args) {
-		fmt.Println(getUsage)
-		return
-	}
-
 	if len(args) != 1 {
 		fmt.Println(getUsage)
 		os.Exit(1)
@@ -82,21 +74,14 @@ func get(args []string) {
 	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w")
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Printf("Error: Key '%s' not found in the Keychain.\n", stripPrefix(keyName))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Key '%s' not found in the Keychain.", stripPrefix(keyName))))
 		os.Exit(1)
 	}
 
 	fmt.Println(strings.TrimSpace(string(output)))
 }
 
-// update modifies the value of an existing secret in the macOS Keychain or
-// creates it if it does not already exist.
 func update(args []string) {
-	if isHelpArg(args) {
-		fmt.Println(updateUsage)
-		return
-	}
-
 	if len(args) != 2 {
 		fmt.Println(updateUsage)
 		os.Exit(1)
@@ -112,62 +97,48 @@ func update(args []string) {
 	// Add a new key
 	cmdAdd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w", newValue)
 	if err := cmdAdd.Run(); err != nil {
-		fmt.Printf("Error: Failed to update key '%s' in the Keychain.\n", stripPrefix(keyName))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to update key '%s' in the Keychain.", stripPrefix(keyName))))
 		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully updated key '%s' in the Keychain.\n", stripPrefix(keyName))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully updated key '%s' in the Keychain.", stripPrefix(keyName))))
 }
 
-// list retrieves and lists all keys stored in the macOS Keychain with the prefix
-// `jangle_` for the current user.
 func list() {
 	if len(os.Args[2:]) > 0 {
 		fmt.Println(listUsage)
 		os.Exit(1)
 	}
 
-	// Execute the security command to dump all keychain items
 	cmd := exec.Command("security", "dump-keychain")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("Error accessing the Keychain: %v\n", err)
+		fmt.Println(errorStyle(fmt.Sprintf("Error accessing the Keychain: %v", err)))
 		os.Exit(1)
 	}
 
-	// Regex pattern to match and extract keys with the prefix `jangle_`
 	regex := regexp.MustCompile(`"svce"<blob>="jangle_(.*?)"`)
 	matches := regex.FindAllStringSubmatch(string(output), -1)
 
-	// Extract matched keys
 	var keys []string
 	for _, match := range matches {
-		if len(match) > 1 { // Ensure there's a captured group
+		if len(match) > 1 {
 			keys = append(keys, match[1])
 		}
 	}
 
-	// Handle case where no keys were found with the `jangle_` prefix
 	if len(keys) == 0 {
-		fmt.Printf("No keys found in the Keychain for user '%s'.\n", os.Getenv("USER"))
+		fmt.Println(errorStyle(fmt.Sprintf("No keys found in the Keychain for user '%s'.", os.Getenv("USER"))))
 		os.Exit(1)
 	}
 
-	// Print keys prefixed with `jangle_`
-	fmt.Printf("Keys in the Keychain for user '%s':\n", os.Getenv("USER"))
+	fmt.Println(headerStyle(fmt.Sprintf("Keys in the Keychain for user '%s':", os.Getenv("USER"))))
 	for _, key := range keys {
-		fmt.Printf("  - %s\n", key)
+		fmt.Println("  - " + key)
 	}
 }
 
-// remove deletes a secret by name from the macOS Keychain using the specified
-// arguments. Validates input and handles errors.
 func remove(args []string) {
-	if isHelpArg(args) {
-		fmt.Println(deleteUsage)
-		return
-	}
-
 	if len(args) != 1 {
 		fmt.Println(deleteUsage)
 		os.Exit(1)
@@ -177,9 +148,9 @@ func remove(args []string) {
 
 	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", keyName)
 	if err := cmd.Run(); err != nil {
-		fmt.Printf("Error: Failed to remove key '%s' from the Keychain.\n", stripPrefix(keyName))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to remove key '%s' from the Keychain.", stripPrefix(keyName))))
 		os.Exit(1)
 	}
 
-	fmt.Printf("Successfully removed key '%s' from the Keychain.\n", stripPrefix(keyName))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully removed key '%s' from the Keychain.", stripPrefix(keyName))))
 }
