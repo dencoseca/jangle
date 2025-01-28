@@ -132,7 +132,7 @@ func list() {
 		os.Exit(1)
 	}
 
-	fmt.Println(headerStyle(fmt.Sprintf("Keys in the Keychain for user '%s':", os.Getenv("USER"))))
+	fmt.Println(headerStyle(fmt.Sprintf("Keys in the Keychain for user '%s':\n", os.Getenv("USER"))))
 	for _, key := range keys {
 		fmt.Println("- " + key)
 	}
