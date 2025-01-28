@@ -10,13 +10,14 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// Styling using lipgloss
 var (
 	headerStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("5")).Render
 	successStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("10")).Render
 	errorStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("9")).Render
 )
 
+// main serves as the entry point for the program, handling command-line
+// arguments to execute various keychain operations.
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println(mainUsage)
@@ -45,6 +46,8 @@ func main() {
 	}
 }
 
+// set adds a key-value pair to the macOS Keychain using the provided arguments
+// or exits with an error if arguments are invalid.
 func set(args []string) {
 	if len(args) != 2 {
 		fmt.Println(setUsage)
@@ -63,6 +66,8 @@ func set(args []string) {
 	fmt.Println(successStyle(fmt.Sprintf("Successfully added key '%s' to the Keychain.", stripPrefix(keyName))))
 }
 
+// get retrieves a secret value by name from the macOS Keychain or exits with an
+// error if the key is not found.
 func get(args []string) {
 	if len(args) != 1 {
 		fmt.Println(getUsage)
@@ -81,6 +86,8 @@ func get(args []string) {
 	fmt.Println(strings.TrimSpace(string(output)))
 }
 
+// update updates an existing key-value pair in the macOS Keychain or adds a new
+// one if the key does not exist.
 func update(args []string) {
 	if len(args) != 2 {
 		fmt.Println(updateUsage)
@@ -104,6 +111,7 @@ func update(args []string) {
 	fmt.Println(successStyle(fmt.Sprintf("Successfully updated key '%s' in the Keychain.", stripPrefix(keyName))))
 }
 
+// the list retrieves and displays all keys related to "jangle" stored in the macOS Keychain for the current user.
 func list() {
 	if len(os.Args[2:]) > 0 {
 		fmt.Println(listUsage)
@@ -138,6 +146,8 @@ func list() {
 	}
 }
 
+// remove deletes a secret from the macOS Keychain based on the provided name or
+// exits with an error if arguments are invalid.
 func remove(args []string) {
 	if len(args) != 1 {
 		fmt.Println(deleteUsage)
