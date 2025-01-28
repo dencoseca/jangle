@@ -12,25 +12,26 @@ import (
 // handling various commands and their arguments.
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: jangle <command> [args...]")
+		fmt.Println(mainUsage)
 		os.Exit(1)
 	}
 
 	mainCommand := os.Args[1]
+	args := os.Args[2:]
 
 	switch mainCommand {
 	case "--help", "help":
 		fmt.Println(mainUsage)
 	case "set":
-		set(os.Args[2:])
+		set(args)
 	case "get":
-		get(os.Args[2:])
+		get(args)
 	case "update":
-		update(os.Args[2:])
+		update(args)
 	case "ls":
 		list()
 	case "delete":
-		delete(os.Args[2:])
+		remove(args)
 	default:
 		fmt.Println(mainUsage)
 		os.Exit(1)
@@ -40,7 +41,7 @@ func main() {
 // set stores a secret with a specified name and value in the macOS Keychain,
 // ensuring a required input format.
 func set(args []string) {
-	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+	if isHelpArg(args) {
 		fmt.Println(setUsage)
 		return
 	}
@@ -66,7 +67,7 @@ func set(args []string) {
 // to the console. It validates the input arguments and handles errors if the
 // secret is not found.
 func get(args []string) {
-	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+	if isHelpArg(args) {
 		fmt.Println(getUsage)
 		return
 	}
@@ -91,7 +92,7 @@ func get(args []string) {
 // update modifies the value of an existing secret in the macOS Keychain or
 // creates it if it does not already exist.
 func update(args []string) {
-	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+	if isHelpArg(args) {
 		fmt.Println(updateUsage)
 		return
 	}
@@ -159,10 +160,10 @@ func list() {
 	}
 }
 
-// delete removes a secret by name from the macOS Keychain using the specified
+// remove deletes a secret by name from the macOS Keychain using the specified
 // arguments. Validates input and handles errors.
-func delete(args []string) {
-	if len(args) == 1 && (args[0] == "--help" || args[0] == "help") {
+func remove(args []string) {
+	if isHelpArg(args) {
 		fmt.Println(deleteUsage)
 		return
 	}

@@ -17,3 +17,9 @@ func addPrefix(key string) string {
 func stripPrefix(key string) string {
 	return strings.TrimPrefix(key, NAMESPACE_PREFIX)
 }
+
+// isHelpArg checks if the provided arguments contain exactly one element and if
+// that element is "--help" or "help".
+func isHelpArg(args []string) bool {
+	return len(args) == 1 && (args[0] == "--help" || args[0] == "help")
+}
