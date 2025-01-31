@@ -11,9 +11,9 @@ import (
 // uniqueness and avoid collisions.
 const NAMESPACE_PREFIX = "jangle_"
 
-// janglercPath stores the path to the user's .janglerc configuration file in
+// janglercFile stores the path to the user's .janglerc configuration file in
 // their home directory.
-var janglercPath = os.Getenv("HOME") + "/.janglerc"
+var janglercFile = os.Getenv("HOME") + "/.janglerc"
 
 // main serves as the entry point for the program, handling command-line
 // arguments to execute various keychain operations.
@@ -90,8 +90,8 @@ func list() {
 // ensureJangleFileExists checks if the .janglerc file exists and creates it if
 // not, exiting on any creation error.
 func ensureJangleFileExists() {
-	if _, err := os.Stat(janglercPath); os.IsNotExist(err) {
-		file, err := os.Create(janglercPath)
+	if _, err := os.Stat(janglercFile); os.IsNotExist(err) {
+		file, err := os.Create(janglercFile)
 		if err != nil {
 			fmt.Println(errorStyle(fmt.Sprintf("Error creating the .janglerc file: %v", err)))
 			os.Exit(1)

@@ -36,15 +36,15 @@ func (s Secret) set() {
 	// export the secret in .janglerc
 	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", s.Name, s.Name)
 
-	file, err := os.OpenFile(janglercPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(janglercFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercPath)))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercFile)))
 		os.Exit(1)
 	}
 	defer file.Close()
 
 	if _, err := file.WriteString(exportLine); err != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercPath)))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercFile)))
 		os.Exit(1)
 	}
 
@@ -108,12 +108,12 @@ func (s Secret) remove() {
 	}
 
 	// Remove the corresponding export line from .janglerc
-	file, err := os.OpenFile(janglercPath, os.O_RDWR, 0644)
+	file, err := os.OpenFile(janglercFile, os.O_RDWR, 0644)
 	if err != nil {
 		if os.IsNotExist(err) {
-			fmt.Println(errorStyle(fmt.Sprintf("Warning: File '%s' does not exist, no export to remove.", janglercPath)))
+			fmt.Println(errorStyle(fmt.Sprintf("Warning: File '%s' does not exist, no export to remove.", janglercFile)))
 		} else {
-			fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to open '%s'.", janglercPath)))
+			fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to open '%s'.", janglercFile)))
 			os.Exit(1)
 		}
 	}
@@ -130,13 +130,13 @@ func (s Secret) remove() {
 	}
 
 	if scannerErr := scanner.Err(); scannerErr != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error reading from '%s': %v", janglercPath, scannerErr)))
+		fmt.Println(errorStyle(fmt.Sprintf("Error reading from '%s': %v", janglercFile, scannerErr)))
 		os.Exit(1)
 	}
 
 	// Rewrite the file with the updated content
-	if err := os.WriteFile(janglercPath, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error writing to '%s': %v", janglercPath, err)))
+	if err := os.WriteFile(janglercFile, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error writing to '%s': %v", janglercFile, err)))
 		os.Exit(1)
 	}
 
