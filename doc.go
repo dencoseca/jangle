@@ -1,4 +1,4 @@
-// jangle provides a command-line tool for using the Mac OS keychain as a secret
-// store. The tool supports operations such as adding, removing, listing and
-// updating secrets using a sudo namespace 'jangle_'.
+// jangle is a command-line tool for managing secrets. It provides an export file
+// to source environment variables in your shell. It supports the Mac OS Keychain
+// for encrypting secrets.
 package main
