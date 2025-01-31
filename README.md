@@ -2,13 +2,13 @@
 
 ## Overview
 
-Jangle is a command line tool to provide an easy way to manage secrets with the Mac OS Keychain.
+Jangle is a command line tool to provide an easy way to manage secrets and export them in a shell environment.
 
 ## Getting started
 
 ### Prerequisites
 
-Assuming a Mac OS environment...
+Mac OS is required as the Mac OS Keychain is currently the only supported secret store.
 
 Go SDK installed:
 
