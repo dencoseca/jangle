@@ -2,6 +2,7 @@ package stores
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -15,10 +16,14 @@ type ExportFile struct {
 
 // NewExportFile creates and returns a pointer to an ExportFile object
 // initialized with the specified file path.
-func NewExportFile(path string) *ExportFile {
+func NewExportFile(path string) (*ExportFile, error) {
+	if path == "" {
+		return nil, errors.New("error: no path provided")
+	}
+
 	return &ExportFile{
 		fileName: path,
-	}
+	}, nil
 }
 
 // Set appends an export statement for the given name to the file managed by the

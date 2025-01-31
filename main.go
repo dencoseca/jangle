@@ -20,7 +20,10 @@ func main() {
 	value := getArgSafely(3)
 
 	store := stores.NewMacOSKeychainStore()
-	exportFile := stores.NewExportFile(os.Getenv("HOME") + "/.jangle_exports")
+	exportFile, err := stores.NewExportFile(os.Getenv("HOME") + "/.jangle_exports")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	switch command {
 	case "--help", "help":
