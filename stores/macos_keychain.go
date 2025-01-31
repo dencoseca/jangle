@@ -8,12 +8,12 @@ import (
 )
 
 type MacOSKeychainStore struct {
-	prefix string
+	namespace string
 }
 
 func NewMacOSKeychainStore() *MacOSKeychainStore {
 	return &MacOSKeychainStore{
-		prefix: "jangle_",
+		namespace: "jangle_",
 	}
 }
 
@@ -82,5 +82,5 @@ func (mk MacOSKeychainStore) List() ([]string, error) {
 }
 
 func (mk MacOSKeychainStore) prefixName(name string) string {
-	return mk.prefix + name
+	return mk.namespace + name
 }
