@@ -107,6 +107,8 @@ func main() {
 	}
 }
 
+// getArgSafely retrieves the command-line argument at the specified index if it
+// exists; otherwise, returns an empty string.
 func getArgSafely(index int) string {
 	if len(os.Args) > index {
 		return os.Args[index]

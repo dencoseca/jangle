@@ -7,16 +7,23 @@ import (
 	"strings"
 )
 
+// ExportFile represents a file used to manage export statements, with operations
+// for appending and deleting entries.
 type ExportFile struct {
 	fileName string
 }
 
+// NewExportFile creates and returns a pointer to an ExportFile object
+// initialized with the specified file path.
 func NewExportFile(path string) *ExportFile {
 	return &ExportFile{
 		fileName: path,
 	}
 }
 
+// Set appends an export statement for the given name to the file managed by the
+// ExportFile instance. Returns an error if the file cannot be opened, written
+// to, or closed properly.
 func (cf ExportFile) Set(name string) error {
 	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", name, name)
 
@@ -33,6 +40,9 @@ func (cf ExportFile) Set(name string) error {
 	return nil
 }
 
+// Delete removes an export statement for the provided name from the file managed
+// by the ExportFile instance. Returns an error if the file cannot be read,
+// written to, or closed properly.
 func (cf ExportFile) Delete(name string) error {
 	file, err := os.OpenFile(cf.fileName, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
