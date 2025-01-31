@@ -10,8 +10,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println(help.MainUsage)
-		os.Exit(1)
+		help.PrintUsageAndExit(help.Main, 1)
 	}
 
 	command := os.Args[1]
@@ -24,11 +23,10 @@ func main() {
 
 	switch command {
 	case "--help", "help":
-		fmt.Println(help.MainUsage)
+		help.PrintUsageAndExit(help.Main)
 	case "get":
 		if name == "" {
-			fmt.Println(help.GetUsage)
-			os.Exit(1)
+			help.PrintUsageAndExit(help.Get, 1)
 		}
 
 		s, err := store.Get(name)
@@ -40,8 +38,7 @@ func main() {
 		fmt.Print(s)
 	case "set":
 		if name == "" || value == "" {
-			fmt.Println(help.SetUsage)
-			os.Exit(1)
+			help.PrintUsageAndExit(help.Set, 1)
 		}
 
 		if err := store.Set(name, value); err != nil {
@@ -58,8 +55,7 @@ func main() {
 		fmt.Println("Source your terminal configuration or restart your shell to use the environment variable.")
 	case "update":
 		if name == "" || value == "" {
-			fmt.Println(help.UpdateUsage)
-			os.Exit(1)
+			help.PrintUsageAndExit(help.Update, 1)
 		}
 
 		if err := store.Update(name, value); err != nil {
@@ -71,8 +67,7 @@ func main() {
 		fmt.Println("Source your terminal configuration or restart your shell to use the updated environment variable.")
 	case "ls":
 		if len(os.Args[2:]) > 0 {
-			fmt.Println(help.ListUsage)
-			os.Exit(1)
+			help.PrintUsageAndExit(help.List, 1)
 		}
 
 		secretNames, err := store.List()
@@ -92,8 +87,7 @@ func main() {
 		}
 	case "delete":
 		if name == "" {
-			fmt.Println(help.DeleteUsage)
-			os.Exit(1)
+			help.PrintUsageAndExit(help.Delete, 1)
 		}
 
 		if err := store.Delete(name); err != nil {
@@ -109,8 +103,7 @@ func main() {
 		styles.Green("Successfully removed '%s'.\n", name)
 		fmt.Println(fmt.Sprintf("To Delete the environment variable restart your terminal or run: unset %s", name))
 	default:
-		fmt.Println(help.MainUsage)
-		os.Exit(1)
+		help.PrintUsageAndExit(help.Main, 1)
 	}
 }
 

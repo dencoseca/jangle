@@ -1,5 +1,10 @@
 package help
 
+import (
+	"fmt"
+	"os"
+)
+
 const MainUsage = `
 Usage: 	jangle COMMAND [ARGS]
 
@@ -63,3 +68,42 @@ Example:
   jangle ls
 
 Run 'jangle --help' for more information.`
+
+type Usage int
+
+const (
+	Main Usage = iota
+	Set
+	Get
+	Update
+	Delete
+	List
+)
+
+func PrintUsageAndExit(usage Usage, code ...int) {
+	exitCode := 0
+	if len(code) > 0 {
+		exitCode = code[0]
+	}
+
+	switch usage {
+	case Main:
+		fmt.Println(MainUsage)
+		os.Exit(exitCode)
+	case Set:
+		fmt.Println(SetUsage)
+		os.Exit(exitCode)
+	case Get:
+		fmt.Println(GetUsage)
+		os.Exit(exitCode)
+	case Update:
+		fmt.Println(UpdateUsage)
+		os.Exit(exitCode)
+	case Delete:
+		fmt.Println(DeleteUsage)
+		os.Exit(exitCode)
+	case List:
+		fmt.Println(ListUsage)
+		os.Exit(exitCode)
+	}
+}
