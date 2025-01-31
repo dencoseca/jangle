@@ -90,6 +90,7 @@ func (s Secret) update() {
 	}
 
 	fmt.Println(successStyle(fmt.Sprintf("Successfully updated '%s'.", s.Name)))
+	fmt.Println(successStyle("Source your terminal configuration or restart your shell to use the updated environment variable."))
 }
 
 // remove deletes a secret by name from the macOS Keychain and removes the

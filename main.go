@@ -11,6 +11,8 @@ import (
 // uniqueness and avoid collisions.
 const NAMESPACE_PREFIX = "jangle_"
 
+// janglercPath stores the path to the user's .janglerc configuration file in
+// their home directory.
 var janglercPath = os.Getenv("HOME") + "/.janglerc"
 
 // main serves as the entry point for the program, handling command-line
