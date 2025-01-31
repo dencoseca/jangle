@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -14,6 +15,7 @@ var (
 	headerStyle  = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("5")).Render
 	successStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("10")).Render
 	errorStyle   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("9")).Render
+	janglercPath = os.Getenv("HOME") + "/.janglerc"
 )
 
 // main serves as the entry point for the program, handling command-line
@@ -63,7 +65,31 @@ func set(args []string) {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully added key '%s' to the Keychain.", stripPrefix(keyName))))
+	// export the secret in .janglerc
+	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", stripPrefix(keyName), stripPrefix(keyName))
+
+	file, err := os.OpenFile(janglercPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercPath)))
+		os.Exit(1)
+	}
+	defer file.Close()
+
+	if _, err := file.WriteString(exportLine); err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to write to '%s'.", janglercPath)))
+		os.Exit(1)
+	}
+
+	// Set the key in the shell environment
+	envVar := stripPrefix(keyName)
+	if err := os.Setenv(envVar, keyValue); err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to set '%s' in the environment variables: %v", envVar, err)))
+	} else {
+		fmt.Println(successStyle(fmt.Sprintf("Successfully set '%s' in the environment variables.", envVar)))
+	}
+
+	fmt.Println(successStyle(fmt.Sprintf("Successfully added key '%s'.", stripPrefix(keyName))))
+	fmt.Println(successStyle("Source your terminal configuration or restart your shell to use the environment variable."))
 }
 
 // get retrieves a secret value by name from the macOS Keychain or exits with an
@@ -79,7 +105,7 @@ func get(args []string) {
 	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", keyName, "-w")
 	output, err := cmd.Output()
 	if err != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error: Key '%s' not found in the Keychain.", stripPrefix(keyName))))
+		fmt.Println(errorStyle(fmt.Sprintf("Error: Key '%s' not found.", stripPrefix(keyName))))
 		os.Exit(1)
 	}
 
@@ -108,7 +134,7 @@ func update(args []string) {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully updated key '%s' in the Keychain.", stripPrefix(keyName))))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully updated key '%s'.", stripPrefix(keyName))))
 }
 
 // the list retrieves and displays all keys related to "jangle" stored in the macOS Keychain for the current user.
@@ -136,11 +162,11 @@ func list() {
 	}
 
 	if len(keys) == 0 {
-		fmt.Println(errorStyle(fmt.Sprintf("No keys found in the Keychain for user '%s'.", os.Getenv("USER"))))
+		fmt.Println(errorStyle(fmt.Sprintf("No keys found for user '%s'.", os.Getenv("USER"))))
 		os.Exit(1)
 	}
 
-	fmt.Println(headerStyle(fmt.Sprintf("Keys in the Keychain for user '%s':\n", os.Getenv("USER"))))
+	fmt.Println(headerStyle(fmt.Sprintf("Keys for user '%s':\n", os.Getenv("USER"))))
 	for _, key := range keys {
 		fmt.Println("- " + key)
 	}
@@ -162,5 +188,46 @@ func remove(args []string) {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully removed key '%s' from the Keychain.", stripPrefix(keyName))))
+	// Remove the corresponding export line from .janglerc
+	file, err := os.OpenFile(janglercPath, os.O_RDWR, 0644)
+	if err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println(errorStyle(fmt.Sprintf("Warning: File '%s' does not exist, no export to remove.", janglercPath)))
+		} else {
+			fmt.Println(errorStyle(fmt.Sprintf("Error: Failed to open '%s'.", janglercPath)))
+			os.Exit(1)
+		}
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	var lines []string
+	exportLine := fmt.Sprintf("export %s=$(jangle get %s)", stripPrefix(keyName), stripPrefix(keyName))
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.TrimSpace(line) != exportLine {
+			lines = append(lines, line)
+		}
+	}
+
+	if scannerErr := scanner.Err(); scannerErr != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error reading from '%s': %v", janglercPath, scannerErr)))
+		os.Exit(1)
+	}
+
+	// Rewrite the file with the updated content
+	if err := os.WriteFile(janglercPath, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Error writing to '%s': %v", janglercPath, err)))
+		os.Exit(1)
+	}
+
+	// remove the key from the shell environment
+	envVar := stripPrefix(keyName)
+	if err := os.Unsetenv(envVar); err != nil {
+		fmt.Println(errorStyle(fmt.Sprintf("Warning: Failed to remove '%s' from the environment variables: %v", envVar, err)))
+	}
+
+	fmt.Println(successStyle(fmt.Sprintf("Successfully removed key '%s'.", stripPrefix(keyName))))
+	fmt.Println(successStyle(fmt.Sprintf("To remove the environment variable restart your terminal or run: unset %s", envVar)))
+
 }
