@@ -17,8 +17,8 @@ func NewMacOSKeychainStore() *MacOSKeychainStore {
 	}
 }
 
-func (mk MacOSKeychainStore) Get(name string) (string, error) {
-	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name), "-w")
+func (m MacOSKeychainStore) Get(name string) (string, error) {
+	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name), "-w")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -28,8 +28,8 @@ func (mk MacOSKeychainStore) Get(name string) (string, error) {
 	return string(output), nil
 }
 
-func (mk MacOSKeychainStore) Set(name, value string) error {
-	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name), "-w", value)
+func (m MacOSKeychainStore) Set(name, value string) error {
+	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name), "-w", value)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: failed to add '%s' to the Keychain", name)
@@ -38,20 +38,20 @@ func (mk MacOSKeychainStore) Set(name, value string) error {
 	return nil
 }
 
-func (mk MacOSKeychainStore) Update(name, value string) error {
-	if err := mk.Delete(name); err != nil {
+func (m MacOSKeychainStore) Update(name, value string) error {
+	if err := m.Delete(name); err != nil {
 		return err
 	}
 
-	if err := mk.Set(name, value); err != nil {
+	if err := m.Set(name, value); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (mk MacOSKeychainStore) Delete(name string) error {
-	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name))
+func (m MacOSKeychainStore) Delete(name string) error {
+	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name))
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain", name)
@@ -60,7 +60,7 @@ func (mk MacOSKeychainStore) Delete(name string) error {
 	return nil
 }
 
-func (mk MacOSKeychainStore) List() ([]string, error) {
+func (m MacOSKeychainStore) List() ([]string, error) {
 	cmd := exec.Command("security", "dump-keychain")
 
 	output, err := cmd.CombinedOutput()
@@ -81,6 +81,6 @@ func (mk MacOSKeychainStore) List() ([]string, error) {
 	return secretNames, nil
 }
 
-func (mk MacOSKeychainStore) prefixName(name string) string {
-	return mk.namespace + name
+func (m MacOSKeychainStore) prefixName(name string) string {
+	return m.namespace + name
 }
