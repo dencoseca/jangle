@@ -48,8 +48,8 @@ func (s Secret) set() {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully added '%s'.", s.Name)))
-	fmt.Println(successStyle("Source your terminal configuration or restart your shell to use the environment variable."))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully added '%s'.\n", s.Name)))
+	fmt.Println("Source your terminal configuration or restart your shell to use the environment variable.")
 }
 
 // get retrieves a secret value by name from the macOS Keychain or exits with an
@@ -89,8 +89,8 @@ func (s Secret) update() {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully updated '%s'.", s.Name)))
-	fmt.Println(successStyle("Source your terminal configuration or restart your shell to use the updated environment variable."))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully updated '%s'.\n", s.Name)))
+	fmt.Println("Source your terminal configuration or restart your shell to use the updated environment variable.")
 }
 
 // remove deletes a secret by name from the macOS Keychain and removes the
@@ -140,6 +140,6 @@ func (s Secret) remove() {
 		os.Exit(1)
 	}
 
-	fmt.Println(successStyle(fmt.Sprintf("Successfully removed '%s'.", s.Name)))
-	fmt.Println(successStyle(fmt.Sprintf("To remove the environment variable restart your terminal or run: unset %s", s.Name)))
+	fmt.Println(successStyle(fmt.Sprintf("Successfully removed '%s'.\n", s.Name)))
+	fmt.Println(fmt.Sprintf("To remove the environment variable restart your terminal or run: unset %s", s.Name))
 }
