@@ -29,12 +29,12 @@ func (cf ExportFile) Set(name string) error {
 
 	file, err := os.OpenFile(cf.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return fmt.Errorf("error: failed to write to '%s'", cf.fileName)
+		return fmt.Errorf("error: failed to write to '%s: %w'", cf.fileName, err)
 	}
 	defer file.Close()
 
 	if _, err := file.WriteString(exportLine); err != nil {
-		return fmt.Errorf("error: failed to write to '%s'", cf.fileName)
+		return fmt.Errorf("error: failed to write to '%s': %w", cf.fileName, err)
 	}
 
 	return nil
@@ -46,7 +46,7 @@ func (cf ExportFile) Set(name string) error {
 func (cf ExportFile) Delete(name string) error {
 	file, err := os.OpenFile(cf.fileName, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
-		return fmt.Errorf("error: Failed to open '%s'", cf.fileName)
+		return fmt.Errorf("error: Failed to open '%s': %w", cf.fileName, err)
 	}
 	defer file.Close()
 
@@ -62,11 +62,11 @@ func (cf ExportFile) Delete(name string) error {
 	}
 
 	if scannerErr := scanner.Err(); scannerErr != nil {
-		return fmt.Errorf("error reading from '%s': %v", cf.fileName, scannerErr)
+		return fmt.Errorf("error reading from '%s': %w", cf.fileName, scannerErr)
 	}
 
 	if err := os.WriteFile(cf.fileName, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
-		return fmt.Errorf("error writing to '%s': %v", cf.fileName, err)
+		return fmt.Errorf("error writing to '%s': %w", cf.fileName, err)
 	}
 
 	return nil

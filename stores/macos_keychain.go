@@ -30,7 +30,7 @@ func (m MacOSKeychainStore) Get(name string) (string, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "", fmt.Errorf("error: '%s' not found", name)
+		return "", fmt.Errorf("error: '%s' not found: %w", name, err)
 	}
 
 	return string(output), nil
@@ -42,7 +42,7 @@ func (m MacOSKeychainStore) Set(name, value string) error {
 	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name), "-w", value)
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error: failed to add '%s' to the Keychain", name)
+		return fmt.Errorf("error: failed to add '%s' to the Keychain: %w", name, err)
 	}
 
 	return nil
@@ -69,7 +69,7 @@ func (m MacOSKeychainStore) Delete(name string) error {
 	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name))
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain", name)
+		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain: %w", name, err)
 	}
 
 	return nil
@@ -82,7 +82,7 @@ func (m MacOSKeychainStore) List() ([]string, error) {
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return nil, fmt.Errorf("error accessing the Keychain: %v", err)
+		return nil, fmt.Errorf("error accessing the Keychain: %w", err)
 	}
 
 	regex := regexp.MustCompile(`"svce"<blob>="jangle_(.*?)"`)
