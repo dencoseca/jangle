@@ -69,6 +69,12 @@ func TestNewExportFile_Set(t *testing.T) {
 			expectedEntry: "",
 			expectedErr:   true,
 		},
+		{
+			name:          "special characters in secret name",
+			secretName:    "GH_TOKEN()&*12-34",
+			expectedEntry: "export GH_TOKEN()&*12-34=$(jangle get GH_TOKEN()&*12-34)\n",
+			expectedErr:   false,
+		},
 	}
 
 	for _, tt := range tests {
