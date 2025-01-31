@@ -80,6 +80,8 @@ const (
 	List
 )
 
+// PrintUsageAndExit prints the usage information for a given command and exits
+// the program with a specified exit code.
 func PrintUsageAndExit(usage Usage, code ...int) {
 	exitCode := 0
 	if len(code) > 0 {
