@@ -53,11 +53,11 @@ func (m MacOSKeychainStore) Set(name, value string) error {
 // process fails, an error is returned.
 func (m MacOSKeychainStore) Update(name, value string) error {
 	if err := m.Delete(name); err != nil {
-		return err
+		return fmt.Errorf("error: failed to update '%s': %w", name, err)
 	}
 
 	if err := m.Set(name, value); err != nil {
-		return err
+		return fmt.Errorf("error: failed to update '%s': %w", name, err)
 	}
 
 	return nil
