@@ -31,13 +31,13 @@ func main() {
 			os.Exit(1)
 		}
 
-		value, err := store.Get(name)
+		n, err := store.Get(name)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		fmt.Print(value)
+		fmt.Print(n)
 	case "set":
 		if name == "" || value == "" {
 			fmt.Println(help.SetUsage)
