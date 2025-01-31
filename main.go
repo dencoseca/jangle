@@ -20,6 +20,7 @@ func main() {
 	value := getArg(3)
 
 	store := stores.NewMacOSKeychainStore()
+	exportFile := stores.NewExportFile(os.Getenv("HOME") + "/.janglerc")
 
 	switch command {
 	case "--help", "help":
@@ -29,6 +30,7 @@ func main() {
 			fmt.Println(help.GetUsage)
 			os.Exit(1)
 		}
+
 		value, err := store.Get(name)
 		if err != nil {
 			fmt.Println(err)
@@ -41,7 +43,14 @@ func main() {
 			fmt.Println(help.SetUsage)
 			os.Exit(1)
 		}
+
 		err := store.Set(name, value)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = exportFile.Set(name)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -54,6 +63,7 @@ func main() {
 			fmt.Println(help.UpdateUsage)
 			os.Exit(1)
 		}
+
 		err := store.Update(name, value)
 		if err != nil {
 			fmt.Println(err)
@@ -67,15 +77,18 @@ func main() {
 			fmt.Println(help.ListUsage)
 			os.Exit(1)
 		}
+
 		secretNames, err := store.List()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
 		if len(secretNames) == 0 {
 			styles.Red("no secrets found for user '%s'", os.Getenv("USER"))
 			os.Exit(0)
 		}
+
 		fmt.Println(fmt.Sprintf("Secrets for user '%s':\n", os.Getenv("USER")))
 		for _, s := range secretNames {
 			fmt.Println("- " + s)
@@ -85,7 +98,14 @@ func main() {
 			fmt.Println(help.DeleteUsage)
 			os.Exit(1)
 		}
+
 		err := store.Delete(name)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = exportFile.Delete(name)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
