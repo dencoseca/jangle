@@ -61,8 +61,8 @@ func (cf ExportFile) Delete(name string) error {
 		}
 	}
 
-	if scannerErr := scanner.Err(); scannerErr != nil {
-		return fmt.Errorf("error reading from '%s': %w", cf.fileName, scannerErr)
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("error reading from '%s': %w", cf.fileName, err)
 	}
 
 	if err := os.WriteFile(cf.fileName, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
