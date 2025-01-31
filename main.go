@@ -16,11 +16,11 @@ func main() {
 
 	command := os.Args[1]
 
-	name := getArg(2)
-	value := getArg(3)
+	name := getArgSafely(2)
+	value := getArgSafely(3)
 
 	store := stores.NewMacOSKeychainStore()
-	exportFile := stores.NewExportFile(os.Getenv("HOME") + "/.janglerc")
+	exportFile := stores.NewExportFile(os.Getenv("HOME") + "/.jangle_exports")
 
 	switch command {
 	case "--help", "help":
@@ -119,7 +119,7 @@ func main() {
 	}
 }
 
-func getArg(index int) string {
+func getArgSafely(index int) string {
 	if len(os.Args) > index {
 		return os.Args[index]
 	}

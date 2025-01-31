@@ -18,7 +18,6 @@ func NewExportFile(path string) *ExportFile {
 }
 
 func (cf ExportFile) Set(name string) error {
-	// add the secret in .janglerc
 	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", name, name)
 
 	file, err := os.OpenFile(cf.path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
