@@ -30,6 +30,10 @@ func NewExportFile(path string) (*ExportFile, error) {
 // ExportFile instance. Returns an error if the file cannot be opened, written
 // to, or closed properly.
 func (cf ExportFile) Set(name string) error {
+	if name == "" {
+		return errors.New("error: no name provided")
+	}
+
 	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", name, name)
 
 	file, err := os.OpenFile(cf.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
