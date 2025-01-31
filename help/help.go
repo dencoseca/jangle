@@ -88,24 +88,22 @@ func PrintHelpAndExit(usage Usage, code ...int) {
 		exitCode = code[0]
 	}
 
+	output := ""
 	switch usage {
 	case Main:
-		fmt.Println(MainUsage)
-		os.Exit(exitCode)
+		output = MainUsage
 	case Set:
-		fmt.Println(SetUsage)
-		os.Exit(exitCode)
+		output = SetUsage
 	case Get:
-		fmt.Println(GetUsage)
-		os.Exit(exitCode)
+		output = GetUsage
 	case Update:
-		fmt.Println(UpdateUsage)
-		os.Exit(exitCode)
+		output = UpdateUsage
 	case Delete:
-		fmt.Println(DeleteUsage)
-		os.Exit(exitCode)
+		output = DeleteUsage
 	case List:
-		fmt.Println(ListUsage)
-		os.Exit(exitCode)
+		output = ListUsage
 	}
+
+	fmt.Println(output)
+	os.Exit(exitCode)
 }
