@@ -25,7 +25,6 @@ func (mk MacOSKeychainStore) Get(name string) (string, error) {
 	}
 
 	return string(output), nil
-
 }
 
 func (mk MacOSKeychainStore) Set(name, value string) error {
@@ -39,14 +38,14 @@ func (mk MacOSKeychainStore) Set(name, value string) error {
 }
 
 func (mk MacOSKeychainStore) Update(name, value string) error {
-	// Delete the old key (if it exists)
-	cmdDelete := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name))
-	cmdDelete.Run() // Ignore errors since we are updating it anyway
+	err := mk.Delete(name)
+	if err != nil {
+		return err
+	}
 
-	// Set a new key
-	cmdAdd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name), "-w", value)
-	if err := cmdAdd.Run(); err != nil {
-		return fmt.Errorf("error: Failed to Update '%s' in the Keychain", name)
+	err = mk.Set(name, value)
+	if err != nil {
+		return err
 	}
 
 	return nil
