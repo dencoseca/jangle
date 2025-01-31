@@ -39,7 +39,7 @@ func (mk MacOSKeychainStore) Set(name, value string) error {
 	}
 
 	// export the secret in .janglerc
-	exportLine := fmt.Sprintf("export %s=$(jangle Get %s)\n", name, name)
+	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", name, name)
 
 	file, err := os.OpenFile(envVariableFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {

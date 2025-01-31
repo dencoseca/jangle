@@ -76,7 +76,7 @@ func main() {
 			styles.Red("no secrets found for user '%s'", os.Getenv("USER"))
 			os.Exit(0)
 		}
-		styles.Purple("Secrets for user '%s':\n", os.Getenv("USER"))
+		fmt.Println(fmt.Sprintf("Secrets for user '%s':\n", os.Getenv("USER")))
 		for _, s := range secretNames {
 			fmt.Println("- " + s)
 		}
