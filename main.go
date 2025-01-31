@@ -5,6 +5,7 @@ import (
 	"github.com/dencoseca/jangle/help"
 	"github.com/dencoseca/jangle/stores"
 	"github.com/dencoseca/jangle/styles"
+	"log"
 	"os"
 )
 
@@ -31,8 +32,7 @@ func main() {
 
 		s, err := store.Get(name)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		fmt.Print(s)
@@ -42,13 +42,11 @@ func main() {
 		}
 
 		if err := store.Set(name, value); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		if err := exportFile.Set(name); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		styles.Green("Successfully added '%s'.\n", name)
@@ -59,8 +57,7 @@ func main() {
 		}
 
 		if err := store.Update(name, value); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		styles.Green("Successfully updated '%s'.\n", name)
@@ -72,8 +69,7 @@ func main() {
 
 		secretNames, err := store.List()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		if len(secretNames) == 0 {
@@ -91,13 +87,11 @@ func main() {
 		}
 
 		if err := store.Delete(name); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		if err := exportFile.Delete(name); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			log.Fatal(err)
 		}
 
 		styles.Green("Successfully removed '%s'.\n", name)
