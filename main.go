@@ -74,7 +74,7 @@ func main() {
 
 		if len(secretNames) == 0 {
 			styles.Red("no secrets found for user '%s'", os.Getenv("USER"))
-			os.Exit(0)
+			return
 		}
 
 		fmt.Println(fmt.Sprintf("Secrets for user '%s':\n", os.Getenv("USER")))
