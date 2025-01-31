@@ -19,6 +19,7 @@ func NewMacOSKeychainStore() *MacOSKeychainStore {
 
 func (mk MacOSKeychainStore) Get(name string) (string, error) {
 	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name), "-w")
+
 	output, err := cmd.Output()
 	if err != nil {
 		return "", fmt.Errorf("error: '%s' not found", name)
@@ -29,8 +30,8 @@ func (mk MacOSKeychainStore) Get(name string) (string, error) {
 
 func (mk MacOSKeychainStore) Set(name, value string) error {
 	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name), "-w", value)
-	err := cmd.Run()
-	if err != nil {
+
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: failed to add '%s' to the Keychain", name)
 	}
 
@@ -38,13 +39,11 @@ func (mk MacOSKeychainStore) Set(name, value string) error {
 }
 
 func (mk MacOSKeychainStore) Update(name, value string) error {
-	err := mk.Delete(name)
-	if err != nil {
+	if err := mk.Delete(name); err != nil {
 		return err
 	}
 
-	err = mk.Set(name, value)
-	if err != nil {
+	if err := mk.Set(name, value); err != nil {
 		return err
 	}
 
@@ -53,8 +52,8 @@ func (mk MacOSKeychainStore) Update(name, value string) error {
 
 func (mk MacOSKeychainStore) Delete(name string) error {
 	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", mk.prefixName(name))
-	err := cmd.Run()
-	if err != nil {
+
+	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain", name)
 	}
 
@@ -63,6 +62,7 @@ func (mk MacOSKeychainStore) Delete(name string) error {
 
 func (mk MacOSKeychainStore) List() ([]string, error) {
 	cmd := exec.Command("security", "dump-keychain")
+
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		return nil, fmt.Errorf("error accessing the Keychain: %v", err)

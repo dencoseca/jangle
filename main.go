@@ -31,27 +31,25 @@ func main() {
 			os.Exit(1)
 		}
 
-		n, err := store.Get(name)
+		s, err := store.Get(name)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		fmt.Print(n)
+		fmt.Print(s)
 	case "set":
 		if name == "" || value == "" {
 			fmt.Println(help.SetUsage)
 			os.Exit(1)
 		}
 
-		err := store.Set(name, value)
-		if err != nil {
+		if err := store.Set(name, value); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		err = exportFile.Set(name)
-		if err != nil {
+		if err := exportFile.Set(name); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -64,8 +62,7 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := store.Update(name, value)
-		if err != nil {
+		if err := store.Update(name, value); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
@@ -99,14 +96,12 @@ func main() {
 			os.Exit(1)
 		}
 
-		err := store.Delete(name)
-		if err != nil {
+		if err := store.Delete(name); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 
-		err = exportFile.Delete(name)
-		if err != nil {
+		if err := exportFile.Delete(name); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
