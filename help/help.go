@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-const MainUsage = `
+var MainUsage = `
 Usage: 	jangle COMMAND [ARGS]
 
 Manage Mac OS Keychain secrets
@@ -19,7 +19,7 @@ Commands:
 
 Run 'jangle <command> --help' for more information.`
 
-const SetUsage = `
+var SetUsage = `
 Usage: 	jangle set <NAME> <VALUE>
 
 Set a secret with a name and value
@@ -29,7 +29,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const GetUsage = `
+var GetUsage = `
 Usage: 	jangle get <NAME>
 
 Get a secret value by name
@@ -39,7 +39,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const UpdateUsage = `
+var UpdateUsage = `
 Usage: 	jangle get <NAME>
 
 Update a secret with a name and value
@@ -49,7 +49,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const DeleteUsage = `
+var DeleteUsage = `
 Usage: 	jangle delete <NAME>
 
 Delete a secret by name
@@ -59,7 +59,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const ListUsage = `
+var ListUsage = `
 Usage: 	jangle ls
 
 List all jangle secrets
