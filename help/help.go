@@ -1,6 +1,6 @@
-package main
+package help
 
-const mainUsage = `
+const MainUsage = `
 Usage: 	jangle COMMAND [ARGS]
 
 Manage Mac OS Keychain secrets
@@ -14,7 +14,7 @@ Commands:
 
 Run 'jangle <command> --help' for more information.`
 
-const setUsage = `
+const SetUsage = `
 Usage: 	jangle set <NAME> <VALUE>
 
 Set a secret with a name and value
@@ -24,7 +24,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const getUsage = `
+const GetUsage = `
 Usage: 	jangle get <NAME>
 
 Get a secret value by name
@@ -34,7 +34,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const updateUsage = `
+const UpdateUsage = `
 Usage: 	jangle get <NAME>
 
 Update a secret with a name and value
@@ -44,7 +44,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const deleteUsage = `
+const DeleteUsage = `
 Usage: 	jangle delete <NAME>
 
 Delete a secret by name
@@ -54,7 +54,7 @@ Example:
 
 Run 'jangle --help' for more information.`
 
-const listUsage = `
+const ListUsage = `
 Usage: 	jangle ls
 
 List all jangle secrets

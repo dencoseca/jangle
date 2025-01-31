@@ -2,110 +2,107 @@ package main
 
 import (
 	"fmt"
+	"github.com/dencoseca/jangle/help"
+	"github.com/dencoseca/jangle/stores"
+	"github.com/dencoseca/jangle/styles"
 	"os"
-	"os/exec"
-	"regexp"
 )
 
-// NAMESPACE_PREFIX defines a default prefix used for namespacing keys to ensure
-// uniqueness and avoid collisions.
-const NAMESPACE_PREFIX = "jangle_"
-
-// janglercFile stores the path to the user's .janglerc configuration file in
-// their home directory.
-var janglercFile = os.Getenv("HOME") + "/.janglerc"
-
-// main serves as the entry point for the program, handling command-line
-// arguments to execute various keychain operations.
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println(mainUsage)
+		fmt.Println(help.MainUsage)
 		os.Exit(1)
 	}
-
-	ensureJangleFileExists()
 
 	command := os.Args[1]
 
-	secret := Secret{
-		Name:  getArg(2, ""),
-		Value: getArg(3, ""),
-	}
+	name := getArg(2)
+	value := getArg(3)
+
+	store := stores.NewMacOSKeychainStore()
 
 	switch command {
 	case "--help", "help":
-		fmt.Println(mainUsage)
-	case "set":
-		secret.set()
+		fmt.Println(help.MainUsage)
 	case "get":
-		secret.get()
-	case "update":
-		secret.update()
-	case "ls":
-		list()
-	case "delete":
-		secret.remove()
-	default:
-		fmt.Println(mainUsage)
-		os.Exit(1)
-	}
-}
-
-// the list retrieves and displays all keys related to "jangle" stored in the
-// macOS Keychain for the current user.
-func list() {
-	if len(os.Args[2:]) > 0 {
-		fmt.Println(listUsage)
-		os.Exit(1)
-	}
-
-	cmd := exec.Command("security", "dump-keychain")
-	output, err := cmd.CombinedOutput()
-	if err != nil {
-		fmt.Println(errorStyle(fmt.Sprintf("Error accessing the Keychain: %v", err)))
-		os.Exit(1)
-	}
-
-	regex := regexp.MustCompile(`"svce"<blob>="jangle_(.*?)"`)
-	matches := regex.FindAllStringSubmatch(string(output), -1)
-
-	var keys []string
-	for _, match := range matches {
-		if len(match) > 1 {
-			keys = append(keys, match[1])
-		}
-	}
-
-	if len(keys) == 0 {
-		fmt.Println(errorStyle(fmt.Sprintf("No secrets found for user '%s'.", os.Getenv("USER"))))
-		os.Exit(1)
-	}
-
-	fmt.Println(headerStyle(fmt.Sprintf("Secrets for user '%s':\n", os.Getenv("USER"))))
-	for _, key := range keys {
-		fmt.Println("- " + key)
-	}
-}
-
-// ensureJangleFileExists checks if the .janglerc file exists and creates it if
-// not, exiting on any creation error.
-func ensureJangleFileExists() {
-	if _, err := os.Stat(janglercFile); os.IsNotExist(err) {
-		file, err := os.Create(janglercFile)
-		if err != nil {
-			fmt.Println(errorStyle(fmt.Sprintf("Error creating the .janglerc file: %v", err)))
+		if name == "" {
+			fmt.Println(help.GetUsage)
 			os.Exit(1)
 		}
-		file.Close()
+		value, err := store.Get(name)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fmt.Print(value)
+	case "set":
+		if name == "" || value == "" {
+			fmt.Println(help.SetUsage)
+			os.Exit(1)
+		}
+		err := store.Set(name, value)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		styles.Green("Successfully added '%s'.\n", name)
+		fmt.Println("Source your terminal configuration or restart your shell to use the environment variable.")
+	case "update":
+		if name == "" || value == "" {
+			fmt.Println(help.UpdateUsage)
+			os.Exit(1)
+		}
+		err := store.Update(name, value)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		styles.Green("Successfully updated '%s'.\n", name)
+		fmt.Println("Source your terminal configuration or restart your shell to use the updated environment variable.")
+	case "ls":
+		if len(os.Args[2:]) > 0 {
+			fmt.Println(help.ListUsage)
+			os.Exit(1)
+		}
+		secretNames, err := store.List()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		if len(secretNames) == 0 {
+			styles.Red("no secrets found for user '%s'", os.Getenv("USER"))
+			os.Exit(0)
+		}
+		styles.Purple("Secrets for user '%s':\n", os.Getenv("USER"))
+		for _, s := range secretNames {
+			fmt.Println("- " + s)
+		}
+	case "delete":
+		if name == "" {
+			fmt.Println(help.DeleteUsage)
+			os.Exit(1)
+		}
+		err := store.Delete(name)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		styles.Green("Successfully removed '%s'.\n", name)
+		fmt.Println(fmt.Sprintf("To Delete the environment variable restart your terminal or run: unset %s", name))
+	default:
+		fmt.Println(help.MainUsage)
+		os.Exit(1)
 	}
 }
 
-// getArg returns the command-line argument at the given index if available,
-// otherwise returns the defaultValue.
-func getArg(index int, defaultValue string) string {
+func getArg(index int) string {
 	if len(os.Args) > index {
 		return os.Args[index]
 	}
 
-	return defaultValue
+	return ""
 }
