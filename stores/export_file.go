@@ -41,12 +41,12 @@ func (cf ExportFile) Delete(name string) error {
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	exportLine := fmt.Sprintf("export %s=$(jangle get %s)", name, name)
+	targetLine := fmt.Sprintf("export %s=$(jangle get %s)", name, name)
 
 	var lines []string
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.TrimSpace(line) != exportLine {
+		if strings.TrimSpace(line) != targetLine {
 			lines = append(lines, line)
 		}
 	}
