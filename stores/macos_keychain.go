@@ -17,16 +17,16 @@ type MacOSKeychainStore struct {
 
 // NewMacOSKeychainStore initializes and returns a new MacOSKeychainStore
 // instance with a predefined namespace.
-func NewMacOSKeychainStore() *MacOSKeychainStore {
+func NewMacOSKeychainStore(namespace string) *MacOSKeychainStore {
 	return &MacOSKeychainStore{
-		namespace: "jangle_",
+		namespace: namespace,
 	}
 }
 
 // Get retrieves a secret from the macOS Keychain by its name and returns the
 // secret value or an error if not found.
 func (m MacOSKeychainStore) Get(name string) (string, error) {
-	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name), "-w")
+	cmd := exec.Command("security", "find-generic-password", "-a", os.Getenv("USER"), "-s", m.namespaced(name), "-w")
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -39,7 +39,7 @@ func (m MacOSKeychainStore) Get(name string) (string, error) {
 // Set stores a key-value pair in the macOS Keychain. Returns an error if adding
 // the key fails.
 func (m MacOSKeychainStore) Set(name, value string) error {
-	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name), "-w", value)
+	cmd := exec.Command("security", "add-generic-password", "-a", os.Getenv("USER"), "-s", m.namespaced(name), "-w", value)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: failed to add '%s' to the Keychain: %w", name, err)
@@ -66,7 +66,7 @@ func (m MacOSKeychainStore) Update(name, value string) error {
 // Delete removes a secret identified by its name from the macOS Keychain.
 // Returns an error if the operation fails.
 func (m MacOSKeychainStore) Delete(name string) error {
-	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", m.prefixName(name))
+	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", m.namespaced(name))
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain: %w", name, err)
@@ -98,8 +98,8 @@ func (m MacOSKeychainStore) List() ([]string, error) {
 	return secretNames, nil
 }
 
-// prefixName appends the namespace to the provided name to ensure unique
+// namespaced appends the namespace to the provided name to ensure unique
 // identification within the Keychain.
-func (m MacOSKeychainStore) prefixName(name string) string {
+func (m MacOSKeychainStore) namespaced(name string) string {
 	return m.namespace + name
 }

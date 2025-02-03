@@ -19,7 +19,7 @@ func main() {
 	name := getArgSafely(2)
 	value := getArgSafely(3)
 
-	store := stores.NewMacOSKeychainStore()
+	store := stores.NewMacOSKeychainStore("jangle_")
 	exportFile, err := stores.NewExportFile(os.Getenv("HOME") + "/.jangle_exports")
 	if err != nil {
 		log.Fatal(err)

@@ -2,6 +2,7 @@ package stores
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -94,6 +95,8 @@ func TestNewExportFile_Set(t *testing.T) {
 				} else {
 					return
 				}
+			} else if err != nil {
+				t.Fatalf("unexpected error: %v", err)
 			}
 
 			content, err := os.ReadFile(fileName)
@@ -103,6 +106,89 @@ func TestNewExportFile_Set(t *testing.T) {
 
 			if string(content) != tt.expectedEntry {
 				t.Fatalf("expected file content %q, got %q", tt.expectedEntry, string(content))
+			}
+		})
+	}
+}
+
+func TestNewExportFile_Delete(t *testing.T) {
+	tests := []struct {
+		name            string
+		initialEntries  []string
+		deleteName      string
+		expectedContent string
+		expectedErr     bool
+	}{
+		{
+			name:            "existing entry",
+			initialEntries:  []string{"export SECRET=$(jangle get SECRET)\n"},
+			deleteName:      "SECRET",
+			expectedContent: "",
+			expectedErr:     false,
+		},
+		{
+			name:            "non-existing entry",
+			initialEntries:  []string{"export SECRET=$(jangle get SECRET)\n"},
+			deleteName:      "NON_EXISTENT",
+			expectedContent: "export SECRET=$(jangle get SECRET)\n",
+			expectedErr:     false,
+		},
+		{
+			name:            "empty name",
+			initialEntries:  []string{"export SECRET=$(jangle get SECRET)\n"},
+			deleteName:      "",
+			expectedContent: "export SECRET=$(jangle get SECRET)\n",
+			expectedErr:     false,
+		},
+		{
+			name:            "special characters in entry",
+			initialEntries:  []string{"export GH_TOKEN@123=$(jangle get GH_TOKEN@123)\n"},
+			deleteName:      "GH_TOKEN@123",
+			expectedContent: "",
+			expectedErr:     false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			fileName := "testdata/jangle_exports"
+			defer os.Remove(fileName)
+
+			// Setup: write initial entries to the file
+			if len(tt.initialEntries) > 0 {
+				content := strings.Join(tt.initialEntries, "")
+				err := os.WriteFile(fileName, []byte(content), 0644)
+				if err != nil {
+					t.Fatalf("failed to set up test file: %v", err)
+				}
+			}
+
+			// Create ExportFile instance
+			exportFile, err := NewExportFile(fileName)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			// Call Delete method
+			err = exportFile.Delete(tt.deleteName)
+			if tt.expectedErr {
+				if err == nil {
+					t.Fatalf("expected an error but didn't get one")
+				} else {
+					return
+				}
+			} else if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+
+			// Verify content
+			content, err := os.ReadFile(fileName)
+			if err != nil {
+				t.Fatalf("failed to read file: %v", err)
+			}
+
+			if string(content) != tt.expectedContent {
+				t.Fatalf("expected file content %q, got %q", tt.expectedContent, string(content))
 			}
 		})
 	}
