@@ -44,8 +44,8 @@ func TestNewExportFile(t *testing.T) {
 				t.Fatalf("expected non-nil ExportFile, got nil")
 			}
 
-			if exportFile.fileName != tt.path {
-				t.Fatalf("expected fileName %q, got %q", tt.path, exportFile.fileName)
+			if exportFile.filePath != tt.path {
+				t.Fatalf("expected fileName %q, got %q", tt.path, exportFile.filePath)
 			}
 		})
 	}

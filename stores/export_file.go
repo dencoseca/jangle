@@ -11,7 +11,7 @@ import (
 // ExportFile represents a file used to manage export statements, with operations
 // for appending and deleting entries.
 type ExportFile struct {
-	fileName string
+	filePath string
 }
 
 // NewExportFile creates and returns a pointer to an ExportFile object
@@ -22,7 +22,7 @@ func NewExportFile(path string) (*ExportFile, error) {
 	}
 
 	return &ExportFile{
-		fileName: path,
+		filePath: path,
 	}, nil
 }
 
@@ -36,14 +36,14 @@ func (cf ExportFile) Set(name string) error {
 
 	exportLine := fmt.Sprintf("export %s=$(jangle get %s)\n", name, name)
 
-	file, err := os.OpenFile(cf.fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(cf.filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return fmt.Errorf("error: failed to write to '%s: %w'", cf.fileName, err)
+		return fmt.Errorf("error: failed to write to '%s: %w'", cf.filePath, err)
 	}
 	defer file.Close()
 
 	if _, err := file.WriteString(exportLine); err != nil {
-		return fmt.Errorf("error: failed to write to '%s': %w", cf.fileName, err)
+		return fmt.Errorf("error: failed to write to '%s': %w", cf.filePath, err)
 	}
 
 	return nil
@@ -53,9 +53,9 @@ func (cf ExportFile) Set(name string) error {
 // by the ExportFile instance. Returns an error if the file cannot be read,
 // written to, or closed properly.
 func (cf ExportFile) Delete(name string) error {
-	file, err := os.OpenFile(cf.fileName, os.O_CREATE|os.O_RDWR, 0644)
+	file, err := os.OpenFile(cf.filePath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
-		return fmt.Errorf("error: Failed to open '%s': %w", cf.fileName, err)
+		return fmt.Errorf("error: Failed to open '%s': %w", cf.filePath, err)
 	}
 	defer file.Close()
 
@@ -71,11 +71,11 @@ func (cf ExportFile) Delete(name string) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading from '%s': %w", cf.fileName, err)
+		return fmt.Errorf("error reading from '%s': %w", cf.filePath, err)
 	}
 
-	if err := os.WriteFile(cf.fileName, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
-		return fmt.Errorf("error writing to '%s': %w", cf.fileName, err)
+	if err := os.WriteFile(cf.filePath, []byte(strings.Join(lines, "\n")+"\n"), 0644); err != nil {
+		return fmt.Errorf("error writing to '%s': %w", cf.filePath, err)
 	}
 
 	return nil
