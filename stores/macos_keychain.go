@@ -15,9 +15,16 @@ type MacOSKeychainStore struct {
 	namespace string
 }
 
-// NewMacOSKeychainStore initializes and returns a new MacOSKeychainStore with
-// the specified namespace.
-func NewMacOSKeychainStore(namespace string) *MacOSKeychainStore {
+// NewMacOSKeychainStore initializes a new MacOSKeychainStore with an optional
+// prefix for key namespaces.
+func NewMacOSKeychainStore(prefix ...string) *MacOSKeychainStore {
+	var namespace string
+	if len(prefix) > 0 {
+		namespace = prefix[0]
+	} else {
+		namespace = "jangle_"
+	}
+
 	return &MacOSKeychainStore{
 		namespace: namespace,
 	}

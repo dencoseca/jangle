@@ -14,16 +14,20 @@ type ExportFile struct {
 	filePath string
 }
 
-// NewExportFile creates a new ExportFile instance with the specified file path.
-// Returns an error if the path is empty.
-func NewExportFile(path string) (*ExportFile, error) {
-	if path == "" {
-		return nil, errors.New("error: no path provided")
+// NewExportFile creates a new ExportFile instance with the optional given path
+// or defaults to "$HOME/.jangle_exports".
+func NewExportFile(path ...string) *ExportFile {
+	var filePath string
+
+	if len(path) == 0 {
+		filePath = os.Getenv("HOME") + "/.jangle_exports"
+	} else {
+		filePath = path[0]
 	}
 
 	return &ExportFile{
-		filePath: path,
-	}, nil
+		filePath: filePath,
+	}
 }
 
 // Set appends an export statement for the given name to the file managed by the
