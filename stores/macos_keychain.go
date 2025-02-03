@@ -19,6 +19,7 @@ type MacOSKeychainStore struct {
 // prefix for key namespaces.
 func NewMacOSKeychainStore(prefix ...string) *MacOSKeychainStore {
 	var namespace string
+
 	if len(prefix) > 0 {
 		namespace = prefix[0]
 	} else {
