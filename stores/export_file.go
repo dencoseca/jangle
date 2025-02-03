@@ -14,8 +14,8 @@ type ExportFile struct {
 	filePath string
 }
 
-// NewExportFile creates and returns a pointer to an ExportFile object
-// initialized with the specified file path.
+// NewExportFile creates a new ExportFile instance with the specified file path.
+// Returns an error if the path is empty.
 func NewExportFile(path string) (*ExportFile, error) {
 	if path == "" {
 		return nil, errors.New("error: no path provided")
