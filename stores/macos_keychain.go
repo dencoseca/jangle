@@ -15,8 +15,8 @@ type MacOSKeychainStore struct {
 	namespace string
 }
 
-// NewMacOSKeychainStore initializes and returns a new MacOSKeychainStore
-// instance with a predefined namespace.
+// NewMacOSKeychainStore initializes and returns a new MacOSKeychainStore with
+// the specified namespace.
 func NewMacOSKeychainStore(namespace string) *MacOSKeychainStore {
 	return &MacOSKeychainStore{
 		namespace: namespace,
