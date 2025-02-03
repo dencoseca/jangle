@@ -59,7 +59,7 @@ func (cf ExportFile) Set(name string) error {
 func (cf ExportFile) Delete(name string) error {
 	file, err := os.OpenFile(cf.filePath, os.O_CREATE|os.O_RDWR, 0644)
 	if err != nil {
-		return fmt.Errorf("error: Failed to open '%s': %w", cf.filePath, err)
+		return fmt.Errorf("error: failed to open '%s': %w", cf.filePath, err)
 	}
 	defer file.Close()
 

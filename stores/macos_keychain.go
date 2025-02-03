@@ -77,7 +77,7 @@ func (m MacOSKeychainStore) Delete(name string) error {
 	cmd := exec.Command("security", "delete-generic-password", "-a", os.Getenv("USER"), "-s", m.namespaced(name))
 
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("error: Failed to Delete '%s' from the Keychain: %w", name, err)
+		return fmt.Errorf("error: failed to delete '%s' from the Keychain: %w", name, err)
 	}
 
 	return nil
