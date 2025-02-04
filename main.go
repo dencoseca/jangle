@@ -73,7 +73,7 @@ func main() {
 		}
 
 		if len(secretNames) == 0 {
-			styles.Red("no secrets found for user '%s'", os.Getenv("USER"))
+			styles.Red("No secrets found for user '%s'", os.Getenv("USER"))
 			return
 		}
 
@@ -95,7 +95,7 @@ func main() {
 		}
 
 		styles.Green("Successfully removed '%s'.\n", name)
-		fmt.Println(fmt.Sprintf("To Delete the environment variable restart your terminal or run: unset %s", name))
+		fmt.Println(fmt.Sprintf("To delete the environment variable restart your terminal or run: unset %s", name))
 	default:
 		help.PrintHelpAndExit(help.Main, 1)
 	}
