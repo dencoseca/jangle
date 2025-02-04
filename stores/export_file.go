@@ -44,7 +44,7 @@ func (ef ExportFile) Set(name string) error {
 	}
 	defer file.Close()
 
-	if _, err := file.WriteString(ef.shellExportStatement(name)); err != nil {
+	if _, err := file.WriteString(ef.shellExportStatement(name) + "\n"); err != nil {
 		return fmt.Errorf("error: failed to write to '%s': %w", ef.filePath, err)
 	}
 
