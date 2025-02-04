@@ -67,9 +67,54 @@ func TestExportFile_Set(t *testing.T) {
 		},
 	}
 
-	err := os.Setenv("HOME", "./testdata")
-	if err != nil {
-		t.Fatal(err)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleanup := createTestFile(t, tt.initialFileContent)
+			defer cleanup()
+
+			exportFile := NewExportFile(testFilePath)
+
+			err := exportFile.Set("TEST_TOKEN")
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assertFileContent(t, tt.expectedFileContent)
+		})
+	}
+}
+
+func TestExportFile_Delete(t *testing.T) {
+	tests := []struct {
+		name                string
+		initialFileContent  string
+		expectedFileContent string
+		errorExpected       bool
+	}{
+		{
+			name:                "when the file is empty an error is thrown",
+			initialFileContent:  "",
+			expectedFileContent: "\n",
+			errorExpected:       true,
+		},
+		{
+			name:                "when the export line is present it deletes it",
+			initialFileContent:  "export TEST_TOKEN=$(jangle get TEST_TOKEN)\n",
+			expectedFileContent: "\n",
+			errorExpected:       false,
+		},
+		{
+			name:                "when two export lines are present it deletes the target line and leaves the others",
+			initialFileContent:  "export TEST_TOKEN=$(jangle get TEST_TOKEN)\nexport ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\n",
+			expectedFileContent: "export ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\n",
+			errorExpected:       false,
+		},
+		{
+			name:                "when multiple export lines are present it deletes the target line and leaves the others",
+			initialFileContent:  "export TEST_TOKEN=$(jangle get TEST_TOKEN)\nexport ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\nexport A_THIRD_TOKEN=$(jangle get A_THIRD_TOKEN)\n",
+			expectedFileContent: "export ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\nexport A_THIRD_TOKEN=$(jangle get A_THIRD_TOKEN)\n",
+			errorExpected:       false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -77,11 +122,13 @@ func TestExportFile_Set(t *testing.T) {
 			cleanup := createTestFile(t, tt.initialFileContent)
 			defer cleanup()
 
-			exportFile := NewExportFile()
+			exportFile := NewExportFile(testFilePath)
 
-			err = exportFile.Set("TEST_TOKEN")
+			err := exportFile.Delete("TEST_TOKEN")
 			if err != nil {
-				t.Fatal(err)
+				if !tt.errorExpected {
+					t.Fatal(err)
+				}
 			}
 
 			assertFileContent(t, tt.expectedFileContent)
