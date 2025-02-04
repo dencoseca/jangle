@@ -111,7 +111,7 @@ func TestExportFile_Delete(t *testing.T) {
 		},
 		{
 			name:                "when multiple export lines are present it deletes the target line and leaves the others",
-			initialFileContent:  "export TEST_TOKEN=$(jangle get TEST_TOKEN)\nexport ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\nexport A_THIRD_TOKEN=$(jangle get A_THIRD_TOKEN)\n",
+			initialFileContent:  "export ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\nexport TEST_TOKEN=$(jangle get TEST_TOKEN)\nexport A_THIRD_TOKEN=$(jangle get A_THIRD_TOKEN)\n",
 			expectedFileContent: "export ANOTHER_TOKEN=$(jangle get ANOTHER_TOKEN)\nexport A_THIRD_TOKEN=$(jangle get A_THIRD_TOKEN)\n",
 			errorExpected:       false,
 		},
