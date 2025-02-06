@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+const testFilePath = "./testdata/.jangle_exports"
+
 func TestNewExportFile(t *testing.T) {
 	tests := []struct {
 		name             string
@@ -135,8 +137,6 @@ func TestExportFile_Delete(t *testing.T) {
 		})
 	}
 }
-
-const testFilePath = "./testdata/.jangle_exports"
 
 func createTestFile(t *testing.T, initialFileContent string) func() {
 	err := os.MkdirAll("./testdata", os.ModePerm)
