@@ -40,7 +40,7 @@ func NewFileStore(filePath string, encryptionKey []byte) (*FileStore, error) {
 		secrets:  make(map[string]string),
 	}
 
-	// Load existing secrets if file exists
+	// Load existing secrets if the file exists
 	if _, err := os.Stat(filePath); err == nil {
 		if err := fs.load(); err != nil {
 			return nil, fmt.Errorf("failed to load secrets: %w", err)

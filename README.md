@@ -8,7 +8,7 @@ Jangle is a command line tool to provide an easy way to manage secrets and expor
 
 ### Prerequisites
 
-Mac OS is required as the Mac OS Keychain is currently the only supported secret store.
+macOS is required as the macOS Keychain is currently the only supported secret store.
 
 Go SDK installed:
 
